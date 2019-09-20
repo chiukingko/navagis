@@ -1,0 +1,151 @@
+#map {
+	height: 100%;
+	width: 100%;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#interface {
+  padding: 10px;
+  margin-top: 90px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  width: 280px;
+  background-color: #fff;
+  position: absolute;
+  z-index: 1;
+  float:left;
+  box-sizing: border-box;
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
+  transition-property: background,box-shadow;
+  font-size: 13px;
+  font-family: Roboto, Arial, sans-serif;
+  text-transform: capitalize;
+}
+
+#analytics {
+  width: 100%;
+  overflow-y: auto;
+  z-index: 3;
+  border-bottom: 1px solid #d3d1d1;
+}
+
+
+#results-panel select, #results-panel input {
+  font-size: 12px;
+}
+
+#results-panel select {
+  width: 100%;
+}
+
+#results-panel i {
+  font-size: 12px;
+}
+
+#results-panel {
+  background: #fff;
+  width: 100%;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 22px;
+  margin: 0 0 5px 0;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
+  transition-property: background,box-shadow; 
+  max-height: 200px;
+  width: 100%;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+
+li {
+  background-color: #f1f1f1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding:10px;
+}
+
+li:nth-child(odd) {
+  background-color: #fcfcfc;
+}
+
+#more {
+  width: 100%;
+  margin: 5px 0 0 0;
+  display: none;
+}
+
+#right-container {
+  width: 300px;
+
+}
+#right-panel {
+  z-index: 2;
+  max-height: 58%;
+  margin-top: 90px;
+  margin-right: 10px;
+  right: 0;
+  position: absolute;
+  width: 300px;
+  overflow-y: scroll;
+  background-color: #fff;
+  box-sizing: border-box;
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
+  padding:10px;
+}
+
+#right-panel select, #right-panel input {
+  font-size: 12px;
+}
+
+#right-panel select {
+  width: 100%;
+}
+
+#right-panel i {
+  font-size: 12px;
+}
+
+#right-button {
+  height: 20px;
+  background-color: #000;
+}
+#drawtools {
+  text-align: center;
+  border-bottom: 1px solid #d3d1d1;
+}
+
+#cuisine {
+  width: 100%;
+  font-size: 13px;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+#more {
+  border: 1px solid #4285f4;
+  background-color: #4285f4;
+  color: #fff;
+  height: 30px;
+}
+
+#analytics button {
+  width: 100%;
+  border: 1px solid #4285f4;
+  background-color: #4285f4;
+  color: #fff;
+  height: 30px;
+}

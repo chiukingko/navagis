@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Navagis Exam - Karl</title>
+		<meta name="viewport" content="initial-scale=1.0">
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+		<div id="interface">
+		<b>Drawing Tools</b><br/><br/>
+		<div id="drawtools">
+		<img id="draw" src="draw.png" style="width:auto;height:40px">
+		<img id="delete-button" src="eraser.png" style="width:auto;height:40px"></center>
+		</div>
+		<p>
+		<div id="analytics"></div>
+		<p>
+		<b>Select Specialty</b>
+		<br/><br/>
+		<select id="specialty" style="width:100%;" >
+			<option value="">All</option>
+			<option value="lechon">Lechon</option>
+			<option value="barbeque">Barbeque</option>
+			<option value="wine">Wine</option>
+		</select>
+		<div id="results-panel">
+		<ul id="places"></ul>
+		</div>
+		<button id="more">More results</button>
+		</div>
+		<div id="right-panel"></div>
+		<div id="map"></div>
+		
+	</body>
+	<!--Javascript section-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="restaurant.js"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB00M2-94XUJJLJAm6MXj64tUQ9srBIniE&libraries=drawing,places&callback=map_obj.init">
+	</script>
+	<script>
+		map_obj = new map_class();
+		/*
+		var apiKey = "AIzaSyB00M2-94XUJJLJAm6MXj64tUQ9srBIniE"
+		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key="+apiKey
+		$.get(url, function(data, status){
+			alert("Data: " + data + "\nStatus: " + status);
+		});*/
+	</script>
+</html>
