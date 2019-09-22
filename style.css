@@ -11,7 +11,7 @@ html, body {
 
 #interface {
   padding: 10px;
-  margin-top: 90px;
+  margin-top: 60px;
   margin-bottom: 10px;
   margin-left: 10px;
   width: 280px;
@@ -82,30 +82,24 @@ li:nth-child(odd) {
   background-color: #fcfcfc;
 }
 
-#more {
-  width: 100%;
-  margin: 5px 0 0 0;
-  display: none;
-}
-
 #right-container {
   width: 300px;
-
 }
 #right-panel {
-  z-index: 2;
-  max-height: 58%;
-  margin-top: 90px;
-  margin-right: 10px;
-  right: 0;
-  position: absolute;
-  width: 300px;
-  overflow-y: scroll;
-  background-color: #fff;
-  box-sizing: border-box;
-  border-radius: 8px 8px 8px 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
-  padding:10px;
+	display:none;
+	z-index: 2;
+	max-height: 58%;
+	margin-top: 90px;
+	margin-right: 10px;
+	right: 0;
+	position: absolute;
+	width: 300px;
+	overflow-y: scroll;
+	background-color: #fff;
+	box-sizing: border-box;
+	border-radius: 8px 8px 8px 8px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
+	padding:10px;
 }
 
 #right-panel select, #right-panel input {
@@ -128,18 +122,19 @@ li:nth-child(odd) {
   text-align: center;
   border-bottom: 1px solid #d3d1d1;
 }
-
-#cuisine {
-  width: 100%;
-  font-size: 13px;
-  font-family: Roboto, Arial, sans-serif;
+#places{
+	max-height: 100px;
 }
 
-#more {
-  border: 1px solid #4285f4;
-  background-color: #4285f4;
-  color: #fff;
-  height: 30px;
+
+.visit-btn{
+	width:100%;
+	height:auto;
+	background-color:green;
+	border: none;
+	padding:10px 5px;
+	color:#ffffff;
+	min-width:50px;
 }
 
 #analytics button {

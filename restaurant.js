@@ -4,18 +4,20 @@ class map_class {
 		this.selectedShape;
 		this.drawingManager;
 		this.infowindow;
+		this.infowindows = [];
 		this.directionsService;
 		this.directionsDisplay;
 		this.center_map = {
-			center: {lat: 10.3157, lng: 123.8854},
-			zoom: 20
-		};
+			center: {lat: 10.304322, lng: 123.8852193},
+			zoom: 14
+		};//Center Map Location
 		this.counter = 0;
 		this.markers = [];
 		this.marker;
-		this.setDrawMap;
-		this.getNextPage = null;
+		this.set_draw_map;
 		this.service;
+		this.nearbyRequest = null;3
+		
 	}
 	
 	init() {
@@ -29,16 +31,12 @@ class map_class {
 			  map: this.map
 		});
 
-		$("#right-panel").css("display","none");
-		$("#analytics").css("display","none");
-		
-		this.set_drawing_manager()
-		this.set_event_listener()
-
-		
+		this.set_drawing_manager();
+		this.set_event_listener();
 	}  
 	
 	set_drawing_manager(){
+		//Setting up shape for drawing
 		this.drawingManager = new google.maps.drawing.DrawingManager({
 			drawingMode: 'circle',
 			drawingControl: true,
@@ -48,7 +46,7 @@ class map_class {
 			},
 			circleOptions: {
 				fillColor: '#ffff00',
-				fillOpacity: 0.5,
+				fillOpacity: 0.4,
 				strokeWeight: 0,
 				clickable: true,
 				draggable: false,
@@ -57,7 +55,7 @@ class map_class {
 			},
 			rectangleOptions: {
 				fillColor: '#ffff00',
-				fillOpacity: 0.5,
+				fillOpacity: 0.4,
 				strokeWeight: 0,
 				clickable: true,
 				draggable: false,
@@ -71,34 +69,30 @@ class map_class {
 		// Setting up the Event listeners 
 		
 		this.setSearch = function() {
-			alert("pass");
-			this.clearMap();
+			this.clear_map();
 			$('#analytics').html('');
 			this.markers = [];
 			var specialty = $("#specialty").val(); 
-			if (specialty == 'all') {
-				nearbyRequest = {location: this.center_map.center, radius: 500, type: ['restaurant']};
+			if (specialty != '') {
+				this.nearbyRequest = {location: this.center_map.center, 
+									  radius: 600, 
+									  keyword: specialty, 
+									  type: ['restaurant'],
+									  };
+				this.service.nearbySearch(this.nearbyRequest,
+									      function(results, status, pagination) {
+									      	if (status !== 'OK') return;
+									      	this.create_markers(results);
+									      }.bind(this));
 			}
-			else {
-				nearbyRequest = {location: this.center_map.center, radius: 500, keyword: specialty, type: ['restaurant']};
-			}
-
-			this.service.nearbySearch(nearbyRequest,
-				function(results, status, pagination) {
-					if (status !== 'OK') return;
-					this.createMarkers(results);
-					moreButton.disabled = !pagination.hasNextPage;
-					this.getNextPage = pagination.hasNextPage && function() {
-					pagination.nextPage();
-				};
-			});
-		};
-		this.setDrawMap = function () {
-			this.drawingManager.setMap(this.map);
-			draw.disabled = true;
 		};
 		
-		this.setShapes = function(event) {
+		this.set_draw_map = function () {
+			this.drawingManager.setMap(this.map);
+			$("#draw-button").disabled = true;
+		};
+		
+		this.set_shapes = function(event) {
 			var ID=[];
 			
 			if (event.type == google.maps.drawing.OverlayType.CIRCLE) {
@@ -107,7 +101,7 @@ class map_class {
 
 				
 				for(var ctr in this.markers){
-					if(google.maps.geometry.spherical.computeDistanceBetween(center,markers[k].getPosition())<=rad){
+					if(google.maps.geometry.spherical.computeDistanceBetween(center,this.markers[ctr].getPosition())<=rad){
 						ID.push(ctr);
 						this.markers[ctr].setMap(this.map);
 					}     
@@ -121,7 +115,7 @@ class map_class {
 			}
 			else {
 				for(var ctr in this.markers){
-					if(event.overlay.getBounds().contains(markers[k].getPosition())){
+					if(event.overlay.getBounds().contains(this.markers[ctr].getPosition())){
 						ID.push(ctr);
 						this.markers[ctr].setMap(this.map);
 					}       
@@ -134,10 +128,8 @@ class map_class {
 			}
 			
 			this.infowindow.open(this.map);
-			this.infowindow.addListener('closeclick', this.deleteShape.bind(this));
-		};
-		
-		this.setDrawedShapes = function(event) {
+			this.infowindow.addListener('closeclick', this.delete_shape.bind(this));
+			
 			if (event.type != google.maps.drawing.OverlayType.POLYGON) {
 				this.drawingManager.setDrawingMode(null);
 				this.drawingManager.setOptions({
@@ -145,43 +137,37 @@ class map_class {
 				});
 				var newShape = event.overlay;
 				newShape.type = event.type;
-				this.setSelection(newShape);
+				this.set_selection(newShape);
 				
 				this.selectNewShape = function() {
-					this.setSelection(newShape);
+					this.set_selection(newShape);
 				}
 				google.maps.event.addListener(newShape, 'click', this.selectNewShape.bind(this));
 			}
-		}
-		
-		this.setNextPage = function() {
-			$("#more").prop("disabled", true);
-			if (this.getNextPage) getNextPage();
 		};
-		google.maps.event.addListener(document.getElementById('specialty'), 'onchange', this.setSearch.bind(this));
-		google.maps.event.addListener(document.getElementById('more'), 'click', this.setNextPage.bind(this));
-		google.maps.event.addListener(this.drawingManager, 'overlaycomplete', this.setDrawedShapes.bind(this));
-		google.maps.event.addListener(this.drawingManager, 'overlaycomplete', this.setShapes.bind(this));
-		google.maps.event.addListener(this.drawingManager, 'drawingmode_changed', this.clearSelection.bind(this));
-		google.maps.event.addListener(this.map, 'click', this.clearSelection.bind(this));
-		google.maps.event.addDomListener(document.getElementById('draw'), 'click', this.setDrawMap.bind(this))
-		google.maps.event.addDomListener(document.getElementById('delete-button'), 'click',this.deleteShape.bind(this));
+		
+		$("#specialty" ).on("change", this.setSearch.bind(this));
+		$("#draw-button" ).on("click", this.set_draw_map.bind(this));
+		$("#delete-button" ).on("click", this.delete_shape.bind(this));
+		google.maps.event.addListener(this.drawingManager, 'overlaycomplete', this.set_shapes.bind(this));
+		google.maps.event.addListener(this.drawingManager, 'drawingmode_changed', this.clear_selection.bind(this));
+		google.maps.event.addListener(this.map, 'click', this.clear_selection.bind(this));
 	}
 	
-	clearSelection() {
+	clear_selection() {
 		if (this.selectedShape) {
 			this.selectedShape.setEditable(false);
 			this.selectedShape = null;
 		}
 	}
 	
-	setSelection(shape) {
-		this.clearSelection();
+	set_selection(shape) {
+		this.clear_selection();
 		this.selectedShape = shape;
 		shape.setEditable(false);
 	}
 	
-	deleteShape(){ //delete selected shape
+	delete_shape(){ //delete selected shape
 		if (this.selectedShape) {
 			this.selectedShape.setMap(null);
 			this.drawingManager.setOptions({
@@ -191,15 +177,20 @@ class map_class {
 		}
 	}
 	
-	clearMap() {
+	clear_map() {
 		document.getElementById("places").innerHTML = "";
 		document.getElementById('right-panel').style.display = 'none';
 		this.directionsDisplay.setMap(null);
-		for (var ctr = 0; ctr < markers.length; ctr++) {
+		for (var ctr = 0; ctr < this.markers.length; ctr++) {
 			this.markers[ctr].setMap(null);
+			
+		}
+		for (var ctr = 0; ctr < this.infowindows.length; ctr++) {
+			this.infowindows[ctr].close();
 		}
 	}
-	calculateAndDisplayRoute(directionsService, directionsDisplay, destination) {
+	
+	calculate_and_display_route(directionsService, directionsDisplay, destination, infowindow) {
 		directionsService.route({
 			origin: this.center_map.center,
 			destination: destination,
@@ -211,93 +202,102 @@ class map_class {
 				infowindow.close()
 			} 
 			else {
-				window.alert('Directions request failed due to ' + status);
+				window.alert('Directions request failed:' + status);
 			}
 		});
 	}
 	
-	
-	createMarkers(places) {
+	create_markers(places) {
 		var bounds = new google.maps.LatLngBounds();
-		var placesList = document.getElementById('places');
-  
+		var placesList = $('#places')[0];
+	
+		
 		for (var i = 0, place; place = places[i]; i++) {
+			this.place = place
 			var image = {
-			  url: place.icon,
-			  size: new google.maps.Size(71, 71),
+			  url: this.place.icon,
+			  size: new google.maps.Size(65, 65),
 			  origin: new google.maps.Point(0, 0),
 			  anchor: new google.maps.Point(17, 34),
 			  scaledSize: new google.maps.Size(25, 25)
 			};
 
-			var marker = new google.maps.Marker({
-			  map: map,
+			this.marker = new google.maps.Marker({
+			  map: this.map,
 			  icon: image,
-			  title: place.name,
-			  position: place.geometry.location
+			  title: this.place.name,
+			  animation: google.maps.Animation.DROP,
+			  position: this.place.geometry.location,
 			});
-
-			//assign listeners to marker
-			marker.addListener('click', (
-			function(marker, i) {
-				return function() {
-				  
-					infowindow = new google.maps.InfoWindow({
-					content: marker.title,
-					position: marker.position,
-
-					});        
-					infowindow.open(map);
-					map.setCenter(marker.getPosition());
-					calculateAndDisplayRoute(this.directionsService, this.directionsDisplay, this.marker.position);
-					this.directionsDisplay.setMap(map);
-					document.getElementById('right-panel').style.display = 'block';
-					directionsDisplay.setPanel(document.getElementById('right-panel'));
-					document.getElementById('analytics').style.display = 'block';
-					document.getElementById("analytics").innerHTML = "";
-
-					var b = document.getElementById('analytics');
-					var a = document.createElement('button');
-					a.textContent = 'Visit';
-					a.id = places[i].id;
-
-					status = places[i].opening_hours['open_now']
-					if (status == 'true' || status =='undefined') {
-					status ='<font color="green">OPEN</font>'
-					}
-					else {
-					status ='<font color="red">CLOSED</font>'
-					}
-
-					document.getElementById("analytics").innerHTML = "<b>Restaurant Info</b><br>" +
-					places[i].name + "<p><b>Status</b> <br/>" +
-					"<i><b>" + status + "</b></i>" +
-					"<p><b>Address</b> <br/>" +
-					places[i].vicinity + "<br/>" +
-					"<p><b>User Rating</b> <br/>" +
-					places[i].rating + " / 5 ("+places[i].user_ratings_total+") users <br/>" +
-					"<p><b>Customers today</b> <br/>" + localStorage.getItem(places[i].id,counter);
-					b.appendChild(a);
-					// basic function to store number of customers in localStorage
-					a.onclick = function (){
-					alert("Thank you for visiting! " + places[i].name);
-					localStorage.setItem(places[i].id,counter+=1)
-					}
+	
+			
+			var markerEvent = function(plac, mark, map){
+			
+				var contentString = "<div><h4>"+mark.title+"</h4></div>"
+				
+				var infowindow = new google.maps.InfoWindow({
+					content: contentString,
+					position: mark.position,
+					
+				});        
+				this.infowindows.push(infowindow);
+				infowindow.open(map);
+				map.setCenter(mark.getPosition());
+				var b = document.getElementById('analytics');
+				var a = document.createElement('button');
+				var hr =  document.createElement('hr');
+				a.textContent = 'Visit / Direction';
+				a.id = plac.id;
+				if ('opening_hours' in plac) {
+					if (plac.opening_hours.open_now)
+						status ='<font color="green">OPEN</font>'
+					else
+						status ='<font color="red">CLOSED</font>'
 				}
-			  })
-			(marker, i));
-
-			markers.push(marker);
+				else
+					status ='<font color="gray">N/A</font>'
+				
+				var counter = parseInt(localStorage.getItem(plac.id))
+				if (counter == null) counter = 0;
+	
+				document.getElementById("analytics").innerHTML = "<b>Restaurant Info</b><br>" +
+				plac.name + "<p><b>Store Open Status</b> <br/>" +
+				"<i><b>" + status + "</b></i>" +
+				"<p><b>Address</b> <br/>" +
+				plac.vicinity + "<br/>" +
+				"<p><b>User Rating</b> <br/>" +
+				plac.rating + " / 5 ("+plac.user_ratings_total+") users <br/>" +
+				"<p><b>Customers today</b> <br/><span id='visit'>" + counter +"</span>";
+				b.appendChild(a);
+				b.appendChild(hr);
+				a.onclick = function (){
+					//Update visit
+					localStorage.setItem(plac.id, counter+=1);
+					$("#visit").html(localStorage.getItem(plac.id))
+					
+					//Get direction 
+					this.calculate_and_display_route(this.directionsService, this.directionsDisplay, mark.position, infowindow);
+					this.directionsDisplay.setMap(this.map);
+					document.getElementById('right-panel').style.display = 'block';
+					this.directionsDisplay.setPanel(document.getElementById('right-panel'));
+					document.getElementById('analytics').style.display = 'block';
+				
+				}.bind(this)
+			};
+			
+			//assign listeners to marker
+			google.maps.event.addDomListener(this.marker, 'click', markerEvent.bind(this, this.place, this.marker, this.map));
+			this.markers.push(this.marker);
 			var li = document.createElement('li');
-			li.textContent = place.name
+			li.textContent = this.place.name
+			google.maps.event.addDomListener(li, 'click', markerEvent.bind(this, this.place, this.marker, this.map));
 			placesList.appendChild(li);
-			bounds.extend(place.geometry.location);
+			bounds.extend(this.place.geometry.location);
 
-			}
-			map.fitBounds(bounds);
-			google.maps.event.addDomListener(window, 'load', initMap);
 		}
+		this.map.fitBounds(bounds);
 	}
+}
 
 	
 
